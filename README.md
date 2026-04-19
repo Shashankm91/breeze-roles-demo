@@ -75,6 +75,7 @@ class DatabaseSeeder extends Seeder
         $regularUser->assignRole('user');
     }
 }
+run cmd php artisan db:seed
 step12:iske baad bootstrap/app.php me ye code page kar middleware register kar
 upar ye lines aayegi
 use Spatie\Permission\Middleware\RoleMiddleware;           // ✅ Add this
