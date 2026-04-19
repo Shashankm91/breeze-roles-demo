@@ -1,59 +1,160 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<!-- Phase 1 -->
+Step 1:To install breeze package
+composer require laravel/breeze --dev
+step2:To install breeze blade stack
+php artisan breeze:install blade
+step3:to install node dependencies
+npm install
+step4:to run npm run dev
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+step5:to run php artisan migrate and show db then start laravel project
+<!-- Phase 2:to install permission package -->
+step6:to install permission package
+composer require spatie/laravel-permission
+step7:to publish migration file 
+php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
+step 8:php artisan migrate
+<!-- phase 3:to modify models and controllers files -->
+step9:add these lines in user model
+use Spatie\Permission\Traits\HasRoles;  // ✅ YE LINE ADD KARO
+class ke andar ye line
+HasRoles
+step10:RegisteredUserController me ye lines add kar do
+use Spatie\Permission\Models\Role;  // ✅ YE LINE ADD KARO
+use Spatie\Permission\Models\Permission;  // ✅ Agar permissions bhi chahiye
+store method me ye lines
+ if (!Role::where('name', 'user')->exists()) {
+            Role::create(['name' => 'user']);
+        }
+        $user->assignRole('user');
 
-## About Laravel
+step11:iske baad databseseeder me dummy data create kr
+<?php
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+namespace Database\Seeders;
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+use App\Models\User;
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+class DatabaseSeeder extends Seeder
+{
+    public function run(): void
+    {
+        // ✅ Roles create karo - GUARD_NAME BHI DO
+        Role::create(['name' => 'admin', 'guard_name' => 'web']);
+        Role::create(['name' => 'user', 'guard_name' => 'web']);
 
-## Learning Laravel
+        // ✅ Permissions create karo - GUARD_NAME BHI DO
+        Permission::create(['name' => 'view dashboard', 'guard_name' => 'web']);
+        Permission::create(['name' => 'manage users', 'guard_name' => 'web']);
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+        // ✅ Admin role ko permissions assign karo
+        $adminRole = Role::findByName('admin', 'web');  // ← guard bhi specify kar
+        $adminRole->givePermissionTo(['view dashboard', 'manage users']);
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+        // ✅ User role ko sirf view dashboard permission do
+        $userRole = Role::findByName('user', 'web');  // ← guard bhi specify kar
+        $userRole->givePermissionTo('view dashboard');
 
-## Laravel Sponsors
+        // ✅ Create an admin user
+        $adminUser = User::create([
+            'name' => 'Admin User',
+            'email' => 'admin@example.com',
+            'password' => bcrypt('password'),
+        ]);
+        $adminUser->assignRole('admin');
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+        // ✅ Create a regular user
+        $regularUser = User::create([
+            'name' => 'Regular User',
+            'email' => 'user@example.com',
+            'password' => bcrypt('password'),
+        ]);
+        $regularUser->assignRole('user');
+    }
+}
+step12:iske baad bootstrap/app.php me ye code page kar middleware register kar
+upar ye lines aayegi
+use Spatie\Permission\Middleware\RoleMiddleware;           // ✅ Add this
+use Spatie\Permission\Middleware\PermissionMiddleware;     // ✅ Add this
+use Spatie\Permission\Middleware\RoleOrPermissionMiddleware; /
 
-### Premium Partners
+middleware function ke andar ye lines
+// ✅ YE LINES ADD KARO - Middleware Aliases Register Karne Ke Liye
+        $middleware->alias([
+            'role' => RoleMiddleware::class,
+            'permission' => PermissionMiddleware::class,
+            'role_or_permission' => RoleOrPermissionMiddleware::class,
+        ]);
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+step13:web.php me ye route add kar 
+// ✅ ✅ ✅ ADMIN ROUTES - Sirf itna code ✅ ✅ ✅
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    
+    Route::get('/dashboard', function () {
+        return view('admin.dashboard');
+    })->name('dashboard');
+    
+    Route::get('/users', function () {
+        $users = \App\Models\User::with('roles')->get();
+        return view('admin.users', compact('users'));
+    })->name('users');
+});
+step14:dashboard blade me ye code daal
+@extends('layouts.app')
 
-## Contributing
+@section('content')
+<div class="py-12">
+    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="p-6 text-gray-900 dark:text-gray-100">
+                <h1 class="text-2xl font-bold mb-4">Admin Dashboard</h1>
+                <p>Welcome, {{ Auth::user()->name }}!</p>
+                <p>Your role: <span class="font-semibold text-blue-600">{{ Auth::user()->roles->pluck('name')->implode(', ') }}</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+step15:users blade me ye code daal
+@extends('layouts.app')
 
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+@section('content')
+<div class="py-12">
+    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="p-6 text-gray-900 dark:text-gray-100">
+                <h1 class="text-2xl font-bold mb-4">User Management</h1>
+                
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead>
+                        <tr>
+                            <th class="px-6 py-3 text-left">Name</th>
+                            <th class="px-6 py-3 text-left">Email</th>
+                            <th class="px-6 py-3 text-left">Roles</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($users as $user)
+                        <tr>
+                            <td class="px-6 py-4">{{ $user->name }}</td>
+                            <td class="px-6 py-4">{{ $user->email }}</td>
+                            <td class="px-6 py-4">
+                                @foreach($user->roles as $role)
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm">{{ $role->name }}</span>
+                                @endforeach
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+step16:
+test kar
