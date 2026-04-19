@@ -156,5 +156,21 @@ step15:users blade me ye code daal
     </div>
 </div>
 @endsection
-step16:
+step16:navigation.blade me pahle ye dhund x-nav-link uske niche ye condition add kar
+@auth
+    @if(auth()->user()->hasRole('admin'))
+        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.*')">
+            {{ __('Admin Panel') }}
+        </x-nav-link>
+    @endif
+@endauth
+aur mobile ke liye ye dhund x-responsive-nav-link uske niche ye add kr
+@auth
+    @if(auth()->user()->hasRole('admin'))
+        <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.*')">
+            {{ __('Admin Panel') }}
+        </x-responsive-nav-link>
+    @endif
+@endauth
+step18:
 test kar
