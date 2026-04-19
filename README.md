@@ -76,6 +76,7 @@ class DatabaseSeeder extends Seeder
     }
 }
 run cmd php artisan db:seed
+
 step12:iske baad bootstrap/app.php me ye code page kar middleware register kar
 upar ye lines aayegi
 use Spatie\Permission\Middleware\RoleMiddleware;           // ✅ Add this
@@ -90,88 +91,13 @@ middleware function ke andar ye lines
             'role_or_permission' => RoleOrPermissionMiddleware::class,
         ]);
 
-step13:web.php me ye route add kar 
-// ✅ ✅ ✅ ADMIN ROUTES - Sirf itna code ✅ ✅ ✅
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('dashboard');
-    
-    Route::get('/users', function () {
-        $users = \App\Models\User::with('roles')->get();
-        return view('admin.users', compact('users'));
-    })->name('users');
-});
-step14:dashboard blade me ye code daal
-@extends('layouts.app')
-
-@section('content')
-<div class="py-12">
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-6 text-gray-900 dark:text-gray-100">
-                <h1 class="text-2xl font-bold mb-4">Admin Dashboard</h1>
-                <p>Welcome, {{ Auth::user()->name }}!</p>
-                <p>Your role: <span class="font-semibold text-blue-600">{{ Auth::user()->roles->pluck('name')->implode(', ') }}</span></p>
-            </div>
-        </div>
-    </div>
-</div>
-@endsection
-
-step15:users blade me ye code daal
-@extends('layouts.app')
-
-@section('content')
-<div class="py-12">
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-6 text-gray-900 dark:text-gray-100">
-                <h1 class="text-2xl font-bold mb-4">User Management</h1>
-                
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead>
-                        <tr>
-                            <th class="px-6 py-3 text-left">Name</th>
-                            <th class="px-6 py-3 text-left">Email</th>
-                            <th class="px-6 py-3 text-left">Roles</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($users as $user)
-                        <tr>
-                            <td class="px-6 py-4">{{ $user->name }}</td>
-                            <td class="px-6 py-4">{{ $user->email }}</td>
-                            <td class="px-6 py-4">
-                                @foreach($user->roles as $role)
-                                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm">{{ $role->name }}</span>
-                                @endforeach
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
-@endsection
-step16:navigation.blade me pahle ye dhund x-nav-link uske niche ye condition add kar
-@auth
-    @if(auth()->user()->hasRole('admin'))
-        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.*')">
-            {{ __('Admin Panel') }}
-        </x-nav-link>
-    @endif
-@endauth
-aur mobile ke liye ye dhund x-responsive-nav-link uske niche ye add kr
-@auth
-    @if(auth()->user()->hasRole('admin'))
-        <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.*')">
-            {{ __('Admin Panel') }}
-        </x-responsive-nav-link>
-    @endif
-@endauth
+navigation.php me
+ @auth
+                        @if (auth()->user()->hasRole('admin'))
+                            <span class="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 text-gray-500">
+                                Admin Panel (Demo)
+                            </span>
+                        @endif
+                    @endauth
 step18:
 test kar

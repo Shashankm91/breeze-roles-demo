@@ -18,19 +18,19 @@ Route::middleware('auth')->group(function () {
 });
 
 // ✅ ✅ ✅ ADMIN ROUTES (Simple way - no extra controller needed) ✅ ✅ ✅
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+// Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
 
-    // Admin dashboard
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('dashboard');
+//     // Admin dashboard
+//     Route::get('/dashboard', function () {
+//         return "Admin Dashboard - Welcome " . auth()->user()->name;
+//     })->name('dashboard');
 
-    // Admin users list
-    Route::get('/users', function () {
-        $users = \App\Models\User::with('roles')->get();
-        return view('admin.users', compact('users'));
-    })->name('users');
-});
+//     // Admin users list
+//     Route::get('/users', function () {
+//         $users = \App\Models\User::with('roles')->get();
+//         return view('admin.users', compact('users'));
+//     })->name('users');
+// });
 
 
 require __DIR__.'/auth.php';
