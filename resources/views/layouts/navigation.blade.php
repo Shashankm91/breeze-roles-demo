@@ -19,9 +19,9 @@
                     <!-- ✅ ✅ ✅ ADMIN MENU - SIRF ADMIN ROLE WALE DEKHEIN ✅ ✅ ✅ -->
                     @auth
                         @if (auth()->user()->hasRole('admin'))
-                            <span class="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 text-gray-500">
+                            <a href="#"  class="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 text-gray-500">
                                 Admin Panel (Demo)
-                            </span>
+                            </a>
                         @endif
                     @endauth
                 </div>
